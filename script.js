@@ -5,39 +5,101 @@ document.addEventListener('DOMContentLoaded', function () {
   
     // Fonction pour récupérer tous les films
     function getAllMovies() {
-      // On fait une requête à l'API
-      return fetch(apiUrl + '?page=1') // On prend la première page
+      return fetch(apiUrl + '?page=1')
         .then(response => {
-          // Vérifie si la réponse est OK
           if (!response.ok) {
             throw new Error('Problème avec l\'API');
           }
-          return response.json(); // Convertit la réponse en JSON
+          return response.json();
         })
         .then(data => {
-          return data.results; // Retourne la liste des films
+          return data.results;
         })
         .catch(error => {
           console.log('Erreur :', error);
-          return []; // Retourne une liste vide en cas d'erreur
+          return [];
         });
+    }
+  
+    // Fonction pour récupérer les films d'une catégorie
+    function getMoviesByCategory(category) {
+      return fetch(apiUrl + '?genre=' + category)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Problème avec l\'API');
+          }
+          return response.json();
+        })
+        .then(data => {
+          return data.results;
+        })
+        .catch(error => {
+          console.log('Erreur :', error);
+          return [];
+        });
+    }
+  
+    // Fonction pour récupérer toutes les catégories depuis l'API
+    function getCategories() {
+      let allCategories = [];
+      let url = 'http://localhost:8000/api/v1/genres/';
+  
+      function fetchPage(pageUrl) {
+        return fetch(pageUrl)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Problème avec l\'API des catégories');
+            }
+            return response.json();
+          })
+          .then(data => {
+            allCategories = allCategories.concat(data.results);
+            if (data.next) {
+              return fetchPage(data.next);
+            }
+            return allCategories;
+          });
+      }
+  
+      return fetchPage(url).catch(error => {
+        console.log('Erreur :', error);
+        return [];
+      });
+    }
+  
+    // Fonction pour remplir le menu déroulant avec les catégories
+    function fillCategorySelect() {
+      getCategories().then(categories => {
+        const select = document.querySelector('.autres select');
+        select.innerHTML = '';
+  
+        const defaultOption = document.createElement('option');
+        defaultOption.textContent = 'Choisir une catégorie';
+        defaultOption.value = '';
+        select.appendChild(defaultOption);
+  
+        for (let i = 0; i < categories.length; i++) {
+          const option = document.createElement('option');
+          option.textContent = categories[i].name;
+          option.value = categories[i].name;
+          select.appendChild(option);
+        }
+      });
     }
   
     // Fonction pour afficher le meilleur film
     function showBestMovie() {
       getAllMovies().then(movies => {
-        // Trouve le film avec le meilleur score
-        let bestMovie = movies[0]; // Prend le premier film par défaut
+        let bestMovie = movies[0];
         for (let i = 0; i < movies.length; i++) {
           if (movies[i].imdb_score > bestMovie.imdb_score) {
             bestMovie = movies[i];
           }
         }
   
-        // Met à jour le HTML
         document.querySelector('.meilleur-film .card-title').textContent = bestMovie.title;
-        document.querySelector('.meilleur-film .card-text').textContent = bestMovie.description;
-        document.querySelector('.meilleur-film .card-img').src = bestMovie.image_url;
+        document.querySelector('.meilleur-film .card-text').textContent = bestMovie.description || 'Pas de description';
+        document.querySelector('.meilleur-film .card-img').src = bestMovie.image_url || 'https://via.placeholder.com/200x300';
         document.querySelector('.meilleur-film .details-btn').dataset.movieId = bestMovie.id;
       });
     }
@@ -45,26 +107,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // Fonction pour afficher les films les mieux notés
     function showTopRatedMovies() {
       getAllMovies().then(movies => {
-        // Trie les films par score (du plus grand au plus petit)
         movies.sort((a, b) => b.imdb_score - a.imdb_score);
-  
-        // Prend les 5 films après le meilleur
-        const topMovies = movies.slice(1, 6); // 5 films après le premier
-  
-        // Récupère la grille
+        const topMovies = movies.slice(1, 7);
         const grid = document.querySelector('.films-mieux-notes .films-grid');
-        grid.innerHTML = ''; // Vide la grille
+        grid.innerHTML = '';
   
-        // Ajoute chaque film
         for (let i = 0; i < topMovies.length; i++) {
           const movie = topMovies[i];
           const movieCard = `
             <div class="col">
               <div class="card h-100 shadow">
-                <img src="${movie.image_url}" class="card-img-top" alt="${movie.title}">
+                <img src="${movie.image_url || 'https://via.placeholder.com/200x300'}" class="card-img-top" alt="${movie.title}">
                 <div class="card-body">
                   <h6 class="card-title">${movie.title}</h6>
-                  <button class="btn btn-danger btn-sm details-btn" data-bs-toggle="modal" data-bs-target="#movieModal" data-movie-id="${movie.id}">Détails</button>
+                  <button class="btn btn-danger btn-sm details-btn" data-movie-id="${movie.id}">Détails</button>
                 </div>
               </div>
             </div>
@@ -76,37 +132,33 @@ document.addEventListener('DOMContentLoaded', function () {
   
     // Fonction pour afficher les films d'une catégorie
     function showMoviesByCategory(category, section) {
-      fetch(apiUrl + '?genre=' + category)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Problème avec l\'API');
-          }
-          return response.json();
-        })
-        .then(data => {
-          const movies = data.results.slice(0, 6); // Prend 6 films max
-          const grid = section.querySelector('.row');
-          grid.innerHTML = '';
+      getMoviesByCategory(category).then(movies => {
+        const moviesToShow = movies.slice(0, 6);
+        const grid = section.querySelector('.row');
+        grid.innerHTML = '';
   
-          for (let i = 0; i < movies.length; i++) {
-            const movie = movies[i];
-            const movieCard = `
-              <div class="col">
-                <div class="card h-100 shadow">
-                  <img src="${movie.image_url}" class="card-img-top" alt="${movie.title}">
-                  <div class="card-body">
-                    <h6 class="card-title">${movie.title}</h6>
-                    <button class="btn btn-danger btn-sm details-btn" data-bs-toggle="modal" data-bs-target="#movieModal" data-movie-id="${movie.id}">Détails</button>
-                  </div>
+        for (let i = 0; i < moviesToShow.length; i++) {
+          const movie = moviesToShow[i];
+          const movieCard = `
+            <div class="col">
+              <div class="card h-100 shadow">
+                <img src="${movie.image_url || 'https://via.placeholder.com/200x300'}" class="card-img-top" alt="${movie.title}">
+                <div class="card-body">
+                  <h6 class="card-title">${movie.title}</h6>
+                  <button class="btn btn-danger btn-sm details-btn" data-movie-id="${movie.id}">Détails</button>
                 </div>
               </div>
-            `;
-            grid.innerHTML += movieCard;
-          }
-        })
-        .catch(error => {
-          console.log('Erreur :', error);
-        });
+            </div>
+          `;
+          grid.innerHTML += movieCard;
+        }
+  
+        if (moviesToShow.length < 6) {
+          const message = document.createElement('p');
+          message.textContent = `Seulement ${moviesToShow.length} film(s) disponible(s) pour cette catégorie.`;
+          section.appendChild(message);
+        }
+      });
     }
   
     // Fonction pour afficher les détails dans le modal
@@ -125,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(movie => {
               document.getElementById('movieModalLabel').textContent = movie.title;
               document.getElementById('modal-body').innerHTML = `
-                <img src="${movie.image_url}" class="img-fluid mb-3" alt="${movie.title}">
+                <img src="${movie.image_url || 'https://via.placeholder.com/200x300'}" class="img-fluid mb-3" alt="${movie.title}">
                 <p><strong>Genres :</strong> ${movie.genres.join(', ')}</p>
                 <p><strong>Date de sortie :</strong> ${movie.date_published}</p>
                 <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
@@ -137,10 +189,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 <p><strong>Recettes :</strong> ${movie.worldwide_gross_income || 'N/A'}</p>
                 <p><strong>Résumé :</strong> ${movie.description}</p>
               `;
+              const modal = new bootstrap.Modal(document.getElementById('movieModal'));
+              modal.show();
             })
             .catch(error => {
               console.log('Erreur :', error);
               document.getElementById('modal-body').innerHTML = '<p>Erreur lors du chargement.</p>';
+              const modal = new bootstrap.Modal(document.getElementById('movieModal'));
+              modal.show();
             });
         });
       }
@@ -152,16 +208,21 @@ document.addEventListener('DOMContentLoaded', function () {
       select.addEventListener('change', function () {
         const category = this.value;
         const autresSection = document.querySelector('.autres');
-        showMoviesByCategory(category, autresSection);
+        if (category) {
+          showMoviesByCategory(category, autresSection);
+        } else {
+          const grid = autresSection.querySelector('.row');
+          grid.innerHTML = '';
+        }
       });
     }
   
     // Appelle toutes les fonctions pour charger les données
+    fillCategorySelect();
     showBestMovie();
     showTopRatedMovies();
-    showMoviesByCategory('Mystery', document.querySelector('.categories section:nth-child(1)'));
-    showMoviesByCategory('Action', document.querySelector('.categories section:nth-child(2)'));
-    showMoviesByCategory('Comédies', document.querySelector('.autres'));
+    showMoviesByCategory('Mystery', document.querySelector('.categories .category-section:nth-child(1)'));
+    showMoviesByCategory('Action', document.querySelector('.categories .category-section:nth-child(2)'));
     setupCategorySelect();
     showMovieDetails();
   });
