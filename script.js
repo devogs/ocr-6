@@ -3,22 +3,32 @@ document.addEventListener('DOMContentLoaded', function () {
     // URL de l'API
     const apiUrl = 'http://localhost:8000/api/v1/titles/';
   
-    // Fonction pour récupérer tous les films
+    // Fonction pour récupérer tous les films depuis l'API
     function getAllMovies() {
-      return fetch(apiUrl + '?page=1')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Problème avec l\'API');
-          }
-          return response.json();
-        })
-        .then(data => {
-          return data.results;
-        })
-        .catch(error => {
-          console.log('Erreur :', error);
-          return [];
-        });
+      let allMovies = [];
+      let url = 'http://localhost:8000/api/v1/titles/';
+  
+      function fetchPage(pageUrl) {
+        return fetch(pageUrl)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Problème avec l\'API des films');
+            }
+            return response.json();
+          })
+          .then(data => {
+            allMovies = allMovies.concat(data.results);
+            if (data.next) {
+              return fetchPage(data.next);
+            }
+            return allMovies;
+          });
+      }
+  
+      return fetchPage(url).catch(error => {
+        console.log('Erreur :', error);
+        return [];
+      });
     }
   
     // Fonction pour récupérer les films d'une catégorie
@@ -108,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function showTopRatedMovies() {
       getAllMovies().then(movies => {
         movies.sort((a, b) => b.imdb_score - a.imdb_score);
-        const topMovies = movies.slice(1, 7);
+        const topMovies = movies.slice(1, 7); // 6 films au lieu de 5
         const grid = document.querySelector('.films-mieux-notes .films-grid');
         grid.innerHTML = '';
   
