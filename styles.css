@@ -1,65 +1,48 @@
-/* Réinitialisation pour un rendu propre */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-/* Style général */
+/* Réinitialisation légère */
 body {
-    background-color: #f4f4f4;
-    color: #333;
-    line-height: 1.6;
-}
-
-/* En-tête */
-header {
-    background: #222;
-    color: white;
-    text-align: center;
-    padding: 20px;
-}
-
-/* Section des films */
-section {
-    margin: 20px auto;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Titre des sections */
-h2 {
-    text-align: center;
-    color: #444;
-}
-
-/* Liste des films */
-.films-liste {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding: 10px;
-}
-
-/* Style des images */
-.films-liste img {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0efef;
+  }
+  
+  /* Personnalisation du header */
+  header {
+    background: linear-gradient(90deg, #3a4b54, #5a6b74); /* Dégradé moderne */
+  }
+  
+  /* Style des cartes */
+  .card {
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: scale(1.05); /* Effet de zoom au survol */
+  }
+  
+  /* Bouton Détails */
+  .details-btn {
+    background-color: #dc3545;
+    border: none;
+  }
+  
+  .details-btn:hover {
+    background-color: #c82333;
+  }
+  
+  /* Ajustement des images */
+  .card-img, .card-img-top {
     height: 200px;
-    border-radius: 5px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.films-liste img:hover {
-    transform: scale(1.05);
-}
-
-/* Pied de page */
-footer {
-    text-align: center;
-    padding: 10px;
-    background: #222;
-    color: white;
-    margin-top: 20px;
-}
+    object-fit: cover; /* Garde les proportions des images */
+  }
+  
+  /* Titres */
+  h2 {
+    color: #3a4b54;
+    font-weight: bold;
+  }
+  
+  /* Responsive pour le meilleur film */
+  @media (max-width: 767.98px) {
+    .meilleur-film .card-img {
+      height: 300px;
+    }
+  }
