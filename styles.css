@@ -1,99 +1,337 @@
-/* Réinitialisation légère */
+/* Réinitialisation des styles par défaut */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f0efef;
-  }
-  
-  /* Personnalisation du header */
-  header {
-    background: linear-gradient(90deg, #3a4b54, #5a6b74); /* Dégradé moderne */
-  }
-  
-  /* Style des cartes */
-  .card {
-    transition: transform 0.2s;
-  }
-  
-  .card:hover {
-    transform: scale(1.05); /* Effet de zoom au survol */
-  }
-  
-  /* Bouton Détails */
-  .details-btn {
-    background-color: #dc3545;
-    border: none;
-  }
-  
-  .details-btn:hover {
-    background-color: #c82333;
-  }
-  
-  /* Ajustement des images */
-  .card-img, .card-img-top {
-    height: 200px;
-    object-fit: cover; /* Garde les proportions des images */
-  }
-  
-  /* Titres */
-  h2 {
-    color: #3a4b54;
-    font-weight: bold;
-  }
-  
-  /* Responsive pour le meilleur film */
-  @media (max-width: 767.98px) {
-    .meilleur-film .card-img {
-      height: 300px;
-    }
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Conteneur principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* En-têtes */
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Section Meilleur film */
+.meilleur-film {
+  border: 1px solid #ddd; /* Bordure grise de JustStream */
+  background-color: #fff; /* Fond blanc */
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre légère de JustStream */
+}
+
+.meilleur-film h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.meilleur-film .card {
+  display: flex; /* Utiliser flexbox pour aligner l'image et le texte */
+  flex-direction: row; /* Image à gauche, texte à droite */
+  align-items: center; /* Centrer verticalement */
+  gap: 20px; /* Espacement entre l'image et le texte */
+  border: none; /* Pas de bordure supplémentaire sur la carte */
+  box-shadow: none; /* Pas d'ombre supplémentaire */
+}
+
+.meilleur-film .card-img {
+  width: 150px; /* Taille de l'image */
+  height: auto;
+  object-fit: cover; /* S'assurer que l'image est bien proportionnée */
+}
+
+.meilleur-film .card-body {
+  flex: 1; /* Le texte prend le reste de l'espace */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.meilleur-film .card-title {
+  font-size: 1.2rem; /* Taille du titre, cohérente avec JustStream */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.meilleur-film .card-text {
+  font-size: 0.9rem; /* Taille de la description */
+  margin-bottom: 15px;
+}
+
+.meilleur-film .details-btn {
+  background-color: #ff0000; /* Bouton rouge de JustStream */
+  color: #fff;
+  border: none;
+  padding: 5px 15px; /* Forme rectangulaire */
+  border-radius: 3px; /* Coins légèrement arrondis */
+  align-self: flex-end; /* Positionner le bouton à droite */
+  cursor: pointer;
+}
+
+.meilleur-film .details-btn:hover {
+  background-color: #e60000; /* Rouge plus foncé au survol */
+}
+
+/* Section Films les mieux notés */
+.films-mieux-notes {
+  margin-bottom: 30px;
+}
+
+.films-mieux-notes .films-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.films-mieux-notes .col {
+  flex: 1 1 calc(16.66% - 15px); /* 6 colonnes avec espacement */
+  min-width: 150px;
+}
+
+.films-mieux-notes .card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.films-mieux-notes .card:hover {
+  transform: translateY(-5px);
+}
+
+.films-mieux-notes .card-img-top {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.films-mieux-notes .card-body {
+  padding: 10px;
+  text-align: center;
+}
+
+.films-mieux-notes .card-title {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.films-mieux-notes .details-btn {
+  background-color: #ff0000;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.films-mieux-notes .details-btn:hover {
+  background-color: #e60000;
+}
+
+/* Sections de catégories */
+.categories .category-section {
+  margin-bottom: 30px;
+}
+
+.categories .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.categories .col {
+  flex: 1 1 calc(16.66% - 15px); /* 6 colonnes avec espacement */
+  min-width: 150px;
+}
+
+.categories .card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.categories .card:hover {
+  transform: translateY(-5px);
+}
+
+.categories .card-img-top {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.categories .card-body {
+  padding: 10px;
+  text-align: center;
+}
+
+.categories .card-title {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.categories .details-btn {
+  background-color: #ff0000;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.categories .details-btn:hover {
+  background-color: #e60000;
+}
+
+/* Section Autres (menu déroulant) */
+.autres {
+  margin-bottom: 30px;
+}
+
+.autres select {
+  padding: 5px;
+  font-size: 1rem;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+}
+
+.autres .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.autres .col {
+  flex: 1 1 calc(16.66% - 15px); /* 6 colonnes avec espacement */
+  min-width: 150px;
+}
+
+.autres .card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.autres .card:hover {
+  transform: translateY(-5px);
+}
+
+.autres .card-img-top {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.autres .card-body {
+  padding: 10px;
+  text-align: center;
+}
+
+.autres .card-title {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.autres .details-btn {
+  background-color: #ff0000;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.autres .details-btn:hover {
+  background-color: #e60000;
+}
+
+/* Modal */
+.modal-content {
+  border-radius: 5px;
+}
+
+.modal-header {
+  background-color: #ff0000;
+  color: #fff;
+  border-bottom: none;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.modal-body p {
+  margin-bottom: 10px;
+}
+
+.modal-body strong {
+  color: #ff0000;
+}
+
+/* Boutons */
+.btn {
+  transition: background-color 0.2s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .meilleur-film .card {
+    flex-direction: column; /* Sur mobile, empiler les éléments */
+    align-items: flex-start;
   }
 
-/* Général pour toutes les sections */
-.card-img-top, .card-img {
-    width: 100%;
-    aspect-ratio: 182 / 268; /* Respecte le ratio 182:268 des images */
-    object-fit: cover; /* Remplit le conteneur sans déformation */
-  }
-  
-  /* Ajustement pour la section "Meilleur film" */
-  .meilleur-film .card {
-    min-height: 300px;
-  }
-  
   .meilleur-film .card-img {
     width: 100%;
-    aspect-ratio: 182 / 268;
-    object-fit: cover;
+    max-width: 200px;
+    margin-bottom: 10px;
   }
-  
-  /* Ajustement pour les cartes dans les sections de catégories */
-  .card {
-    display: flex;
-    flex-direction: column;
+
+  .meilleur-film .details-btn {
+    align-self: center; /* Centrer le bouton sur mobile */
   }
-  
-  .card-body {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+
+  .films-mieux-notes .col,
+  .categories .col,
+  .autres .col {
+    flex: 1 1 calc(33.33% - 15px); /* 3 colonnes sur mobile */
   }
-  
-  /* Pour s'assurer que les grilles restent cohérentes */
-  .films-grid, .row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .films-mieux-notes .col,
+  .categories .col,
+  .autres .col {
+    flex: 1 1 calc(50% - 15px); /* 2 colonnes sur petit écran */
   }
-  
-  /* Style pour les images dans le modal */
-  #modal-body img {
-    width: 100%;
-    aspect-ratio: 182 / 268;
-    object-fit: cover;
-    margin-bottom: 1rem;
-  }
-  
-  /* Style pour le cas où une image est absente */
-  .card-img-top[src=""], .card-img[src=""], #modal-body img[src=""] {
-    display: none; /* Cache l'image si src est vide */
-  }
+}
