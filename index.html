@@ -1,77 +1,98 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <link rel="stylesheet" href="styles.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JustStreamIt</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JustStreamIt</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>JustStreamIt</h1>
-        <nav>
-            <ul>
-                <li><a href="#meilleur-film">Meilleur Film</a></li>
-                <li><a href="#films-notes">Films les mieux notés</a></li>
-                <li><a href="#categorie-1">Catégorie 1</a></li>
-                <li><a href="#categorie-2">Catégorie 2</a></li>
-                <li><a href="#autres-categories">Autres</a></li>
-            </ul>
-        </nav>
-    </header>
-    
-    <main>
-        <section id="meilleur-film">
-            <h2>Meilleur Film</h2>
-            <img src="https://picsum.photos/200/300" alt="Meilleur film">
-            <h3>Titre du film</h3>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </br>
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure </br>
-                dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non </br>
-                 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
-            <button>Détails</button>
-        </section>
-        
-        <section id="films-notes">
-            <h2>Films les mieux notés</h2>
-            <div class="films-liste">
-                <img src="https://picsum.photos/200/300" alt="Film 1">
-                <img src="https://picsum.photos/200/300" alt="Film 2">
-                <img src="https://picsum.photos/200/300" alt="Film 3">
-                <img src="https://picsum.photos/200/300" alt="Film 4">
-            </div>
-        </section>     
+  <!-- Header -->
+  <header class="bg-dark text-white py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="logo">
+        <img src="logo/logo_dark.png" alt="JustStreamIt" style="width: 50px;">
+      </div>
+      <h1 class="h4 mb-0">JustStreamIt - Vidéos à la demande</h1>
+    </div>
+  </header>
 
-        <section id="categorie-1">
-            <h2>Catégorie 1</h2>
-            <div class="films-liste">
-                <h3>Voir au dessus</h3>
+  <main class="container mt-5">
+    <!-- Section Meilleur film -->
+    <section class="meilleur-film mb-5">
+      <h1 class="mb-3">Meilleur film</h1>
+      <div class="card mb-3 shadow">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img class="card-img" alt="Meilleur film">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">Meilleur film</h5>
+              <p class="card-text">Description du meilleur film...</p>
+              <button class="btn btn-danger btn-sm details-btn">Détails</button>
             </div>
-        </section>
-        
-        <section id="categorie-2">
-            <h2>Catégorie 2</h2>
-            <div class="films-liste">
-                <!-- Liste des films de la catégorie 2 -->
-            </div>
-        </section>
-        
-        <section id="autres-categories">
-            <h2>Autres Catégories</h2>
-            <select>
-                <option value="">Sélectionner une catégorie</option>
-                <!-- Options des catégories -->
-            </select>
-            <div class="films-liste">
-                <!-- Liste des films de la catégorie sélectionnée -->
-            </div>
-        </section>
-    </main>
-    
-    <footer>
-        <p>&copy; 2025 JustStreamIt</p>
-    </footer>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Films les mieux notés -->
+    <section class="films-mieux-notes mb-5">
+      <h2 class="mb-3">Films les mieux notés</h2>
+      <div class="films-grid row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+        <!-- Laisser vide, sera rempli par le JavaScript -->
+      </div>
+    </section>
+
+    <!-- Section Catégories (Mystery, Action) -->
+    <section class="categories mb-5">
+      <section class="category-section">
+        <h2 class="mb-3">Mystery</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+          <!-- Laisser vide, sera rempli par le JavaScript -->
+        </div>
+      </section>
+
+      <section class="category-section">
+        <h2 class="mb-3 mt-4">Action</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+          <!-- Laisser vide, sera rempli par le JavaScript -->
+        </div>
+      </section>
+    </section>
+
+    <!-- Section Autres -->
+    <section class="autres mb-5">
+      <h2 class="mb-3">Autres</h2>
+      <select class="form-select w-auto mb-3"></select>
+      <p>Catégorie choisie dans le menu déroulant</p>
+      <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+        <!-- Laisser vide, sera rempli par le JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal pour les détails -->
+  <div class="modal fade" id="movieModal" tabindex="-1" aria-labelledby="movieModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="movieModalLabel">Détails du film</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <!-- Contenu rempli dynamiquement -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
