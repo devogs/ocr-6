@@ -124,10 +124,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Fonction pour récupérer les détails complets d'un film
   function getMovieDetails(movieId) {
-    return fetch(`http://localhost:8000/api/v1/titles/${movieId}/`)
+    console.log(`Récupération des détails pour le film ID: ${movieId}`);
+    return fetch(`${apiUrl}${movieId}/`)
       .then(response => {
         if (!response.ok) {
-          throw new Error('Problème avec l\'API pour les détails du film');
+          throw new Error(`Erreur HTTP ${response.status}: Problème avec l'API pour les détails du film`);
         }
         return response.json();
       })
@@ -136,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return data;
       })
       .catch(error => {
-        console.log('Erreur lors de la récupération des détails :', error);
+        console.error('Erreur lors de la récupération des détails :', error);
         return null;
       });
   }
@@ -183,11 +184,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const container = document.querySelector('.meilleur-film');
     if (!container) {
       console.log('Section meilleur-film non trouvée.');
-      return;
+      return Promise.resolve();
     }
     container.innerHTML = '<h2>Meilleur film</h2><div class="best-movie-content"><p>Chargement en cours...</p></div>';
 
-    getAllMovies().then(movies => {
+    return getAllMovies().then(movies => {
       if (!Array.isArray(movies) || movies.length === 0) {
         console.log('Aucun film trouvé ou données invalides.');
         container.innerHTML = `
@@ -216,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // Si aucune description n'est disponible, faire une requête pour les détails complets
       const fetchDetails = description ? Promise.resolve(bestMovie) : getMovieDetails(bestMovie.id);
 
-      fetchDetails.then(detailedMovie => {
+      return fetchDetails.then(detailedMovie => {
         if (detailedMovie && !description) {
           description = detailedMovie.long_description || detailedMovie.description || detailedMovie.short_description || '';
         }
@@ -233,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Vérifier l'URL de l'image
-        checkImageUrl(bestMovie.image_url).then(isValid => {
+        return checkImageUrl(bestMovie.image_url).then(isValid => {
           if (isValid) {
             container.innerHTML = `
               <h2>Meilleur film</h2>
@@ -274,11 +275,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const container = document.querySelector('.films-mieux-notes');
     if (!container) {
       console.log('Section films-mieux-notes non trouvée.');
-      return;
+      return Promise.resolve();
     }
     container.innerHTML = '<h2>Films les mieux notés</h2><div class="films-grid row"><p>Chargement en cours...</p></div>';
 
-    getAllMovies().then(movies => {
+    return getAllMovies().then(movies => {
       if (!Array.isArray(movies) || movies.length === 0) {
         console.log('Aucun film trouvé ou données invalides.');
         container.innerHTML = '<h2>Films les mieux notés</h2><div class="films-grid row"><p>Aucun film disponible</p></div>';
@@ -297,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       });
 
-      Promise.all(imagePromises).then(results => {
+      return Promise.all(imagePromises).then(results => {
         setTimeout(() => {
           for (let i = 0; i < results.length; i++) {
             const { movie, isValid } = results[i];
@@ -351,17 +352,17 @@ document.addEventListener('DOMContentLoaded', function () {
   function showMoviesByCategory(category, section) {
     if (!section) {
       console.log('Section non trouvée pour la catégorie :', category);
-      return;
+      return Promise.resolve();
     }
     const grid = section.querySelector('.row');
     if (!grid) {
       console.log('Grille (.row) non trouvée dans la section pour :', category);
-      return;
+      return Promise.resolve();
     }
 
     grid.innerHTML = '<p>Chargement en cours...</p>';
 
-    getMoviesByCategory(category).then(movies => {
+    return getMoviesByCategory(category).then(movies => {
       if (!Array.isArray(movies) || movies.length === 0) {
         console.log('Aucun film trouvé pour la catégorie :', category);
         grid.innerHTML = '<p>Aucun film disponible</p>';
@@ -377,134 +378,143 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       });
 
-      Promise.all(imagePromises).then(results => {
-        setTimeout(() => {
-          grid.innerHTML = ''; // Vider la grille
+      return Promise.all(imagePromises).then(results => {
+        // Supprimer le setTimeout pour ajouter les éléments immédiatement
+        grid.innerHTML = ''; // Vider la grille
 
-          for (let i = 0; i < results.length; i++) {
-            const { movie, isValid } = results[i];
+        for (let i = 0; i < results.length; i++) {
+          const { movie, isValid } = results[i];
 
-            const col = document.createElement('div');
-            col.className = 'col';
+          const col = document.createElement('div');
+          col.className = 'col';
 
-            const card = document.createElement('div');
-            card.className = 'card h-100 shadow';
+          const card = document.createElement('div');
+          card.className = 'card h-100 shadow';
 
-            const img = document.createElement('img');
-            img.className = 'card-img-top';
-            img.alt = movie.title;
-            if (isValid) {
-              img.src = movie.image_url;
-            } else {
-              console.log('Image invalide pour le film, utilisation de l\'image alternative :', movie.title, movie.image_url);
-              img.src = 'logo/alternative.png';
-              img.alt = `${movie.title} (image alternative)`;
-            }
-
-            const cardBody = document.createElement('div');
-            cardBody.className = 'card-body';
-
-            const title = document.createElement('h6');
-            title.className = 'card-title';
-            title.textContent = movie.title;
-
-            const button = document.createElement('button');
-            button.className = 'btn btn-danger btn-sm details-btn';
-            button.dataset.movieId = movie.id;
-            button.textContent = 'Détails';
-
-            cardBody.appendChild(title);
-            cardBody.appendChild(button);
-            card.appendChild(img);
-            card.appendChild(cardBody);
-            col.appendChild(card);
-            grid.appendChild(col);
+          const img = document.createElement('img');
+          img.className = 'card-img-top';
+          img.alt = movie.title;
+          if (isValid) {
+            img.src = movie.image_url;
+          } else {
+            console.log('Image invalide pour le film, utilisation de l\'image alternative :', movie.title, movie.image_url);
+            img.src = 'logo/alternative.png';
+            img.alt = `${movie.title} (image alternative)`;
           }
 
-          if (moviesToShow.length < 6) {
-            const message = document.createElement('p');
-            message.textContent = `Seulement ${moviesToShow.length} film(s) disponible(s) pour cette catégorie.`;
-            section.appendChild(message);
-          }
-        }, 100);
+          const cardBody = document.createElement('div');
+          cardBody.className = 'card-body';
+
+          const title = document.createElement('h6');
+          title.className = 'card-title';
+          title.textContent = movie.title;
+
+          const button = document.createElement('button');
+          button.className = 'btn btn-danger btn-sm details-btn';
+          button.dataset.movieId = movie.id;
+          button.textContent = 'Détails';
+
+          cardBody.appendChild(title);
+          cardBody.appendChild(button);
+          card.appendChild(img);
+          card.appendChild(cardBody);
+          col.appendChild(card);
+          grid.appendChild(col);
+        }
+
+        if (moviesToShow.length < 6) {
+          const message = document.createElement('p');
+          message.textContent = `Seulement ${moviesToShow.length} film(s) disponible(s) pour cette catégorie.`;
+          section.appendChild(message);
+        }
       });
     });
   }
 
   // Fonction pour afficher les détails dans le modal
   function showMovieDetails() {
+    console.log('Initialisation des écouteurs pour les boutons "Détails"');
     const buttons = document.querySelectorAll('.details-btn');
-    for (let i = 0; i < buttons.length; i++) {
-      buttons[i].addEventListener('click', function () {
+    console.log(`Nombre de boutons "Détails" trouvés : ${buttons.length}`);
+
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
         const movieId = this.dataset.movieId;
+        console.log(`Clic sur le bouton "Détails" pour le film ID: ${movieId}`);
+
+        if (!movieId) {
+          console.error('ID du film non défini sur le bouton');
+          return;
+        }
 
         // Chercher le film dans allMovies ou categoryMovies
-        let movie = allMovies.find(m => m.id === movieId);
+        let movie = allMovies.find(m => m.id == movieId);
         if (!movie) {
           for (let category in categoryMovies) {
-            movie = categoryMovies[category].find(m => m.id === movieId);
+            movie = categoryMovies[category].find(m => m.id == movieId);
             if (movie) break;
           }
         }
 
         if (movie) {
+          console.log('Film trouvé dans les données locales :', movie.title);
           // Film trouvé dans les données déjà chargées
           checkImageUrl(movie.image_url).then(isValid => {
             document.getElementById('movieModalLabel').textContent = movie.title;
             document.getElementById('modal-body').innerHTML = `
               <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
-              <p><strong>Genres :</strong> ${movie.genres.join(', ')}</p>
-              <p><strong>Date de sortie :</strong> ${movie.date_published}</p>
+              <p><strong>Genres :</strong> ${movie.genres ? movie.genres.join(', ') : 'N/A'}</p>
+              <p><strong>Date de sortie :</strong> ${movie.date_published || 'N/A'}</p>
               <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
-              <p><strong>Score IMDB :</strong> ${movie.imdb_score}</p>
-              <p><strong>Réalisateur :</strong> ${movie.directors.join(', ')}</p>
-              <p><strong>Acteurs :</strong> ${movie.actors.join(', ')}</p>
-              <p><strong>Durée :</strong> ${movie.duration} min</p>
-              <p><strong>Pays :</strong> ${movie.countries.join(', ')}</p>
+              <p><strong>Score IMDB :</strong> ${movie.imdb_score || 'N/A'}</p>
+              <p><strong>Réalisateur :</strong> ${movie.directors ? movie.directors.join(', ') : 'N/A'}</p>
+              <p><strong>Acteurs :</strong> ${movie.actors ? movie.actors.join(', ') : 'N/A'}</p>
+              <p><strong>Durée :</strong> ${movie.duration ? movie.duration + ' min' : 'N/A'}</p>
+              <p><strong>Pays :</strong> ${movie.countries ? movie.countries.join(', ') : 'N/A'}</p>
               <p><strong>Recettes :</strong> ${movie.worldwide_gross_income || 'N/A'}</p>
-              <p><strong>Résumé :</strong> ${movie.long_description || 'Pas de résumé'}</p>
+              <p><strong>Résumé :</strong> ${movie.long_description || movie.description || movie.short_description || 'Pas de résumé'}</p>
             `;
-            const modal = new bootstrap.Modal(document.getElementById('movieModal'));
+            const modalElement = document.getElementById('movieModal');
+            const modal = new bootstrap.Modal(modalElement);
             modal.show();
           });
         } else {
           // Si non trouvé, faire un appel à l'API
-          fetch(apiUrl + movieId + '/')
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Problème avec l\'API');
-              }
-              return response.json();
-            })
-            .then(movie => {
-              checkImageUrl(movie.image_url).then(isValid => {
-                document.getElementById('movieModalLabel').textContent = movie.title;
-                document.getElementById('modal-body').innerHTML = `
-                  <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
-                  <p><strong>Genres :</strong> ${movie.genres.join(', ')}</p>
-                  <p><strong>Date de sortie :</strong> ${movie.date_published}</p>
-                  <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
-                  <p><strong>Score IMDB :</strong> ${movie.imdb_score}</p>
-                  <p><strong>Réalisateur :</strong> ${movie.directors.join(', ')}</p>
-                  <p><strong>Acteurs :</strong> ${movie.actors.join(', ')}</p>
-                  <p><strong>Durée :</strong> ${movie.duration} min</p>
-                  <p><strong>Pays :</strong> ${movie.countries.join(', ')}</p>
-                  <p><strong>Recettes :</strong> ${movie.worldwide_gross_income || 'N/A'}</p>
-                  <p><strong>Résumé :</strong> ${movie.long_description || 'Pas de résumé'}</p>
-                `;
-                const modal = new bootstrap.Modal(document.getElementById('movieModal'));
-                modal.show();
-              });
-            })
-            .catch(error => {
-              console.log('Erreur :', error);
-              document.getElementById('modal-body').innerHTML = '<p>Erreur lors du chargement.</p>';
-              const modal = new bootstrap.Modal(document.getElementById('movieModal'));
+          console.log('Film non trouvé localement, appel API pour les détails...');
+          getMovieDetails(movieId).then(movie => {
+            if (!movie) {
+              console.error('Aucun détail trouvé pour ce film');
+              document.getElementById('movieModalLabel').textContent = 'Erreur';
+              document.getElementById('modal-body').innerHTML = '<p>Erreur lors du chargement des détails du film.</p>';
+              const modalElement = document.getElementById('movieModal');
+              const modal = new bootstrap.Modal(modalElement);
+              modal.show();
+              return;
+            }
+
+            checkImageUrl(movie.image_url).then(isValid => {
+              document.getElementById('movieModalLabel').textContent = movie.title;
+              document.getElementById('modal-body').innerHTML = `
+                <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
+                <p><strong>Genres :</strong> ${movie.genres ? movie.genres.join(', ') : 'N/A'}</p>
+                <p><strong>Date de sortie :</strong> ${movie.date_published || 'N/A'}</p>
+                <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
+                <p><strong>Score IMDB :</strong> ${movie.imdb_score || 'N/A'}</p>
+                <p><strong>Réalisateur :</strong> ${movie.directors ? movie.directors.join(', ') : 'N/A'}</p>
+                <p><strong>Acteurs :</strong> ${movie.actors ? movie.actors.join(', ') : 'N/A'}</p>
+                <p><strong>Durée :</strong> ${movie.duration ? movie.duration + ' min' : 'N/A'}</p>
+                <p><strong>Pays :</strong> ${movie.countries ? movie.countries.join(', ') : 'N/A'}</p>
+                <p><strong>Recettes :</strong> ${movie.worldwide_gross_income || 'N/A'}</p>
+                <p><strong>Résumé :</strong> ${movie.long_description || movie.description || movie.short_description || 'Pas de résumé'}</p>
+              `;
+              const modalElement = document.getElementById('movieModal');
+              const modal = new bootstrap.Modal(modalElement);
               modal.show();
             });
+          });
         }
       });
-    }
+    });
   }
 
   // Événement pour le menu déroulant "Autres"
@@ -514,7 +524,9 @@ document.addEventListener('DOMContentLoaded', function () {
       const category = this.value;
       const autresSection = document.querySelector('.autres');
       if (category) {
-        showMoviesByCategory(category, autresSection);
+        showMoviesByCategory(category, autresSection).then(() => {
+          showMovieDetails(); // Réattacher les écouteurs après le chargement des films
+        });
       } else {
         const grid = autresSection.querySelector('.row');
         grid.innerHTML = '';
@@ -522,12 +534,23 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Appelle toutes les fonctions pour charger les données
-  fillCategorySelect();
-  showBestMovie();
-  showTopRatedMovies();
-  showMoviesByCategory('Mystery', document.querySelector('.categories .category-section:nth-of-type(1) .row')?.parentElement || document.querySelector('.categories .row:nth-of-type(1)')?.parentElement);
-  showMoviesByCategory('Action', document.querySelector('.categories .category-section:nth-of-type(2) .row')?.parentElement || document.querySelector('.categories .row:nth-of-type(2)')?.parentElement);
-  setupCategorySelect();
-  showMovieDetails();
+  // Fonction pour charger toutes les sections et attacher les écouteurs
+  function loadAllSections() {
+    Promise.all([
+      fillCategorySelect(),
+      showBestMovie(),
+      showTopRatedMovies(),
+      showMoviesByCategory('Mystery', document.querySelector('.categories .category-section:nth-of-type(1) .row')?.parentElement || document.querySelector('.categories .row:nth-of-type(1)')?.parentElement),
+      showMoviesByCategory('Action', document.querySelector('.categories .category-section:nth-of-type(2) .row')?.parentElement || document.querySelector('.categories .row:nth-of-type(2)')?.parentElement),
+      setupCategorySelect()
+    ]).then(() => {
+      console.log('Toutes les sections sont chargées, attachement des écouteurs pour les boutons "Détails"');
+      showMovieDetails(); // Attacher les écouteurs après que toutes les sections sont chargées
+    }).catch(error => {
+      console.error('Erreur lors du chargement des sections :', error);
+    });
+  }
+
+  // Lancer le chargement des sections
+  loadAllSections();
 });
