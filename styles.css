@@ -54,8 +54,8 @@ h2 {
 
 .meilleur-film .card-img {
   width: 150px; /* Taille de l'image */
-  height: auto;
-  object-fit: cover; /* S'assurer que l'image est bien proportionnée */
+  height: auto; /* Hauteur automatique pour préserver les proportions */
+  object-fit: contain; /* Afficher l'image entière */
 }
 
 .meilleur-film .card-body {
@@ -120,8 +120,8 @@ h2 {
 
 .films-mieux-notes .card-img-top {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto; /* Hauteur automatique pour afficher l'image entière */
+  object-fit: contain; /* Afficher l'image entière sans rognage */
 }
 
 .films-mieux-notes .card-body {
@@ -181,8 +181,8 @@ h2 {
 
 .categories .card-img-top {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto; /* Hauteur automatique pour afficher l'image entière */
+  object-fit: contain; /* Afficher l'image entière sans rognage */
 }
 
 .categories .card-body {
@@ -250,8 +250,8 @@ h2 {
 
 .autres .card-img-top {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto; /* Hauteur automatique pour afficher l'image entière */
+  object-fit: contain; /* Afficher l'image entière sans rognage */
 }
 
 .autres .card-body {

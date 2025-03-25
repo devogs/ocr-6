@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
         select.innerHTML = '';
 
         const defaultOption = document.createElement('option');
-        defaultOption.textContent = 'Catégories';
+        defaultOption.textContent = 'Choisir une catégorie';
         defaultOption.value = '';
         select.appendChild(defaultOption);
 
