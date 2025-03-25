@@ -46,3 +46,54 @@ body {
       height: 300px;
     }
   }
+
+/* Général pour toutes les sections */
+.card-img-top, .card-img {
+    width: 100%;
+    aspect-ratio: 182 / 268; /* Respecte le ratio 182:268 des images */
+    object-fit: cover; /* Remplit le conteneur sans déformation */
+  }
+  
+  /* Ajustement pour la section "Meilleur film" */
+  .meilleur-film .card {
+    min-height: 300px;
+  }
+  
+  .meilleur-film .card-img {
+    width: 100%;
+    aspect-ratio: 182 / 268;
+    object-fit: cover;
+  }
+  
+  /* Ajustement pour les cartes dans les sections de catégories */
+  .card {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  /* Pour s'assurer que les grilles restent cohérentes */
+  .films-grid, .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  /* Style pour les images dans le modal */
+  #modal-body img {
+    width: 100%;
+    aspect-ratio: 182 / 268;
+    object-fit: cover;
+    margin-bottom: 1rem;
+  }
+  
+  /* Style pour le cas où une image est absente */
+  .card-img-top[src=""], .card-img[src=""], #modal-body img[src=""] {
+    display: none; /* Cache l'image si src est vide */
+  }
