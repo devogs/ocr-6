@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
         select.innerHTML = '';
 
         const defaultOption = document.createElement('option');
-        defaultOption.textContent = 'Choisir une catégorie';
+        defaultOption.textContent = 'Catégories';
         defaultOption.value = '';
         select.appendChild(defaultOption);
 
@@ -185,19 +185,21 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log('Section meilleur-film non trouvée.');
       return;
     }
-    container.innerHTML = '<p>Chargement en cours...</p>';
+    container.innerHTML = '<h2>Meilleur film</h2><div class="best-movie-content"><p>Chargement en cours...</p></div>';
 
     getAllMovies().then(movies => {
       if (!Array.isArray(movies) || movies.length === 0) {
         console.log('Aucun film trouvé ou données invalides.');
         container.innerHTML = `
           <h2>Meilleur film</h2>
-          <div class="card">
-            <img class="card-img" src="logo/alternative.png" alt="Aucun film disponible">
-            <div class="card-body">
-              <h5 class="card-title">Aucun film disponible</h5>
-              <p class="card-text"></p>
-              <button class="btn btn-danger details-btn">Détails</button>
+          <div class="best-movie-content">
+            <div class="card">
+              <img class="card-img" src="logo/alternative.png" alt="Aucun film disponible">
+              <div class="card-body">
+                <h5 class="card-title">Aucun film disponible</h5>
+                <p class="card-text"></p>
+                <button class="btn btn-danger details-btn">Détails</button>
+              </div>
             </div>
           </div>
         `;
@@ -235,12 +237,14 @@ document.addEventListener('DOMContentLoaded', function () {
           if (isValid) {
             container.innerHTML = `
               <h2>Meilleur film</h2>
-              <div class="card">
-                <img class="card-img" src="${bestMovie.image_url}" alt="${bestMovie.title}">
-                <div class="card-body">
-                  <h5 class="card-title">${bestMovie.title}</h5>
-                  <p class="card-text">${description}</p>
-                  <button class="btn btn-danger details-btn" data-movie-id="${bestMovie.id}">Détails</button>
+              <div class="best-movie-content">
+                <div class="card">
+                  <img class="card-img" src="${bestMovie.image_url}" alt="${bestMovie.title}">
+                  <div class="card-body">
+                    <h5 class="card-title">${bestMovie.title}</h5>
+                    <p class="card-text">${description}</p>
+                    <button class="btn btn-danger details-btn" data-movie-id="${bestMovie.id}">Détails</button>
+                  </div>
                 </div>
               </div>
             `;
@@ -248,12 +252,14 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Image invalide pour le meilleur film, utilisation de l\'image alternative :', bestMovie.image_url);
             container.innerHTML = `
               <h2>Meilleur film</h2>
-              <div class="card">
-                <img class="card-img" src="logo/alternative.png" alt="${bestMovie.title} (image alternative)">
-                <div class="card-body">
-                  <h5 class="card-title">${bestMovie.title}</h5>
-                  <p class="card-text">${description}</p>
-                  <button class="btn btn-danger details-btn" data-movie-id="${bestMovie.id}">Détails</button>
+              <div class="best-movie-content">
+                <div class="card">
+                  <img class="card-img" src="logo/alternative.png" alt="${bestMovie.title} (image alternative)">
+                  <div class="card-body">
+                    <h5 class="card-title">${bestMovie.title}</h5>
+                    <p class="card-text">${description}</p>
+                    <button class="btn btn-danger details-btn" data-movie-id="${bestMovie.id}">Détails</button>
+                  </div>
                 </div>
               </div>
             `;

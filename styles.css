@@ -28,16 +28,19 @@ h2 {
 
 /* Section Meilleur film */
 .meilleur-film {
-  border: 1px solid #ddd; /* Bordure grise de JustStream */
-  background-color: #fff; /* Fond blanc */
-  padding: 15px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre légère de JustStream */
 }
 
 .meilleur-film h2 {
   font-size: 1.5rem;
   margin-bottom: 10px;
+}
+
+.meilleur-film .best-movie-content {
+  border: 1px solid #ddd; /* Bordure grise de JustStream */
+  background-color: #fff; /* Fond blanc */
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre légère de JustStream */
 }
 
 .meilleur-film .card {
@@ -123,7 +126,10 @@ h2 {
 
 .films-mieux-notes .card-body {
   padding: 10px;
-  text-align: center;
+  min-height: 100px; /* Hauteur minimale pour uniformiser */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Titre en haut, bouton en bas */
 }
 
 .films-mieux-notes .card-title {
@@ -138,6 +144,7 @@ h2 {
   padding: 5px 10px;
   border-radius: 3px;
   cursor: pointer;
+  align-self: flex-end; /* Aligner le bouton à droite */
 }
 
 .films-mieux-notes .details-btn:hover {
@@ -180,7 +187,10 @@ h2 {
 
 .categories .card-body {
   padding: 10px;
-  text-align: center;
+  min-height: 100px; /* Hauteur minimale pour uniformiser */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Titre en haut, bouton en bas */
 }
 
 .categories .card-title {
@@ -195,6 +205,7 @@ h2 {
   padding: 5px 10px;
   border-radius: 3px;
   cursor: pointer;
+  align-self: flex-end; /* Aligner le bouton à droite */
 }
 
 .categories .details-btn:hover {
@@ -245,7 +256,10 @@ h2 {
 
 .autres .card-body {
   padding: 10px;
-  text-align: center;
+  min-height: 100px; /* Hauteur minimale pour uniformiser */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Titre en haut, bouton en bas */
 }
 
 .autres .card-title {
@@ -260,6 +274,7 @@ h2 {
   padding: 5px 10px;
   border-radius: 3px;
   cursor: pointer;
+  align-self: flex-end; /* Aligner le bouton à droite */
 }
 
 .autres .details-btn:hover {
@@ -325,6 +340,18 @@ h2 {
   .categories .col,
   .autres .col {
     flex: 1 1 calc(33.33% - 15px); /* 3 colonnes sur mobile */
+  }
+
+  .films-mieux-notes .card-body,
+  .categories .card-body,
+  .autres .card-body {
+    min-height: 120px; /* Ajuster la hauteur minimale sur mobile */
+  }
+
+  .films-mieux-notes .details-btn,
+  .categories .details-btn,
+  .autres .details-btn {
+    align-self: center; /* Centrer le bouton sur mobile */
   }
 }
 
