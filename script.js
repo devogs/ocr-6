@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Fonction pour récupérer les détails complets d'un film
   function getMovieDetails(movieId) {
     console.log(`Récupération des détails pour le film ID: ${movieId}`);
-    return fetch(`${apiUrl}${movieId}/`)
+    return fetch(`${apiUrl}${movieId}`) // Suppression du "/" final
       .then(response => {
         if (!response.ok) {
           throw new Error(`Erreur HTTP ${response.status}: Problème avec l'API pour les détails du film`);
