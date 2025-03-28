@@ -2,17 +2,11 @@
 document.addEventListener('DOMContentLoaded', function () {
   // URL de l'API
   const apiUrl = 'http://localhost:8000/api/v1/titles/';
+  const genresApiUrl = 'http://localhost:8000/api/v1/genres/';
 
   // Variables globales pour stocker les films
   let allMovies = [];
   let categoryMovies = {};
-
-  // Liste statique des catégories
-  const staticCategories = [
-    'Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary',
-    'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Musical', 'Mystery',
-    'Romance', 'Sci-Fi', 'Sport', 'Thriller', 'War', 'Western'
-  ];
 
   // Cache pour les URLs d'images valides
   const imageUrlCache = JSON.parse(localStorage.getItem('imageUrlCache')) || {};
@@ -142,9 +136,40 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   }
 
-  // Fonction pour récupérer toutes les catégories
+  // Fonction pour récupérer toutes les catégories dynamiquement via l'API
   function getCategories() {
-    return Promise.resolve(staticCategories);
+    let allCategories = [];
+    let nextUrl = genresApiUrl;
+
+    // Fonction récursive pour gérer la pagination
+    function fetchCategories(url) {
+      return fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Problème avec l\'API des genres');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Ajouter les genres de la page actuelle
+          allCategories = allCategories.concat(data.results.map(genre => genre.name));
+          // Si une page suivante existe, continuer à récupérer
+          if (data.next) {
+            return fetchCategories(data.next);
+          }
+          return allCategories;
+        });
+    }
+
+    return fetchCategories(nextUrl)
+      .then(categories => {
+        console.log('Catégories récupérées dynamiquement :', categories);
+        return categories;
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des catégories :', error);
+        return [];
+      });
   }
 
   // Fonction pour remplir le menu déroulant avec les catégories
@@ -162,6 +187,14 @@ document.addEventListener('DOMContentLoaded', function () {
         defaultOption.textContent = 'Choisir une catégorie';
         defaultOption.value = '';
         select.appendChild(defaultOption);
+
+        if (categories.length === 0) {
+          const errorOption = document.createElement('option');
+          errorOption.textContent = 'Aucune catégorie disponible';
+          errorOption.value = '';
+          select.appendChild(errorOption);
+          return;
+        }
 
         for (let i = 0; i < categories.length; i++) {
           const option = document.createElement('option');

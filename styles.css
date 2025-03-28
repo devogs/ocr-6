@@ -38,7 +38,7 @@ h2 {
 .banner-content {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espace entre le logo et le texte */
+  gap: 30px; /* Espace entre le logo et le texte */
 }
 
 .banner-logo {
