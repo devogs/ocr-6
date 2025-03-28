@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // Cache pour les URLs d'images valides
   const imageUrlCache = JSON.parse(localStorage.getItem('imageUrlCache')) || {};
 
+  // Fonction pour formater un nombre avec des espaces pour les milliers
+  function formatNumberWithSpaces(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
   // Fonction pour vérifier si une URL d'image est valide avec réessai
   function checkImageUrl(url, retries = 2, delay = 500) {
     return new Promise((resolve) => {
@@ -119,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Fonction pour récupérer les détails complets d'un film
   function getMovieDetails(movieId) {
     console.log(`Récupération des détails pour le film ID: ${movieId}`);
-    return fetch(`${apiUrl}${movieId}`) // Suppression du "/" final
+    return fetch(`${apiUrl}${movieId}`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`Erreur HTTP ${response.status}: Problème avec l'API pour les détails du film`);
@@ -481,24 +486,28 @@ document.addEventListener('DOMContentLoaded', function () {
         if (movie) {
           console.log('Film trouvé dans les données locales :', movie.title);
           // Film trouvé dans les données déjà chargées
-          checkImageUrl(movie.image_url).then(isValid => {
-            document.getElementById('movieModalLabel').textContent = movie.title;
-            document.getElementById('modal-body').innerHTML = `
-              <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
-              <p><strong>Genres :</strong> ${movie.genres ? movie.genres.join(', ') : 'N/A'}</p>
-              <p><strong>Date de sortie :</strong> ${movie.date_published || 'N/A'}</p>
-              <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
-              <p><strong>Score IMDB :</strong> ${movie.imdb_score || 'N/A'}</p>
-              <p><strong>Réalisateur :</strong> ${movie.directors ? movie.directors.join(', ') : 'N/A'}</p>
-              <p><strong>Acteurs :</strong> ${movie.actors ? movie.actors.join(', ') : 'N/A'}</p>
-              <p><strong>Durée :</strong> ${movie.duration ? movie.duration + ' min' : 'N/A'}</p>
-              <p><strong>Pays :</strong> ${movie.countries ? movie.countries.join(', ') : 'N/A'}</p>
-              <p><strong>Recettes :</strong> ${movie.worldwide_gross_income || 'N/A'}</p>
-              <p><strong>Résumé :</strong> ${movie.long_description || movie.description || movie.short_description || 'Pas de résumé'}</p>
-            `;
-            const modalElement = document.getElementById('movieModal');
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
+          // On préfère toujours récupérer les détails complets via l'API pour avoir les données les plus complètes
+          getMovieDetails(movieId).then(detailedMovie => {
+            if (detailedMovie) {
+              movie = detailedMovie; // Remplacer par les données complètes
+            }
+            checkImageUrl(movie.image_url).then(isValid => {
+              document.getElementById('movieModalLabel').textContent = movie.title;
+              document.getElementById('modal-body').innerHTML = `
+                <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
+                ${movie.genres ? `<p><strong>Genres :</strong> ${movie.genres.join(', ')}</p>` : ''}
+                <p><strong>Date de sortie :</strong> ${movie.date_published || 'N/A'}</p>
+                <p><strong>Score IMDB :</strong> ${movie.imdb_score || 'N/A'}</p>
+                <p><strong>Réalisateur :</strong> ${movie.directors ? movie.directors.join(', ') : 'N/A'}</p>
+                <p><strong>Acteurs :</strong> ${movie.actors ? movie.actors.join(', ') : 'N/A'}</p>
+                <p><strong>Durée :</strong> ${movie.duration ? movie.duration + ' min' : 'N/A'}</p>
+                <p><strong>Recettes :</strong> ${movie.worldwide_gross_income ? '$' + formatNumberWithSpaces(movie.worldwide_gross_income) : 'N/A'}</p>
+                <p><strong>Résumé :</strong> ${movie.long_description || movie.description || 'Pas de résumé'}</p>
+              `;
+              const modalElement = document.getElementById('movieModal');
+              const modal = new bootstrap.Modal(modalElement);
+              modal.show();
+            });
           });
         } else {
           // Si non trouvé, faire un appel à l'API
@@ -518,16 +527,14 @@ document.addEventListener('DOMContentLoaded', function () {
               document.getElementById('movieModalLabel').textContent = movie.title;
               document.getElementById('modal-body').innerHTML = `
                 <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
-                <p><strong>Genres :</strong> ${movie.genres ? movie.genres.join(', ') : 'N/A'}</p>
+                ${movie.genres ? `<p><strong>Genres :</strong> ${movie.genres.join(', ')}</p>` : ''}
                 <p><strong>Date de sortie :</strong> ${movie.date_published || 'N/A'}</p>
-                <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
                 <p><strong>Score IMDB :</strong> ${movie.imdb_score || 'N/A'}</p>
                 <p><strong>Réalisateur :</strong> ${movie.directors ? movie.directors.join(', ') : 'N/A'}</p>
                 <p><strong>Acteurs :</strong> ${movie.actors ? movie.actors.join(', ') : 'N/A'}</p>
                 <p><strong>Durée :</strong> ${movie.duration ? movie.duration + ' min' : 'N/A'}</p>
-                <p><strong>Pays :</strong> ${movie.countries ? movie.countries.join(', ') : 'N/A'}</p>
-                <p><strong>Recettes :</strong> ${movie.worldwide_gross_income || 'N/A'}</p>
-                <p><strong>Résumé :</strong> ${movie.long_description || movie.description || movie.short_description || 'Pas de résumé'}</p>
+                <p><strong>Recettes :</strong> ${movie.worldwide_gross_income ? '$' + formatNumberWithSpaces(movie.worldwide_gross_income) : 'N/A'}</p>
+                <p><strong>Résumé :</strong> ${movie.long_description || movie.description || 'Pas de résumé'}</p>
               `;
               const modalElement = document.getElementById('movieModal');
               const modal = new bootstrap.Modal(modalElement);
