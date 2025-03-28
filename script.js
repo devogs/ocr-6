@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <img class="card-img" src="logo/alternative.png" alt="Aucun film disponible">
               <div class="card-body">
                 <h5 class="card-title">Aucun film disponible</h5>
-                <p class="card-text"></p>
+                <p class="card-text">Erreur lors du chargement des films.</p>
                 <button class="btn btn-danger details-btn">Détails</button>
               </div>
             </div>
@@ -248,22 +248,11 @@ document.addEventListener('DOMContentLoaded', function () {
       let description = bestMovie.long_description || bestMovie.description || bestMovie.short_description || '';
 
       // Si aucune description n'est disponible, faire une requête pour les détails complets
-      const fetchDetails = description ? Promise.resolve(bestMovie) : getMovieDetails(bestMovie.id);
-
-      return fetchDetails.then(detailedMovie => {
-        if (detailedMovie && !description) {
-          description = detailedMovie.long_description || detailedMovie.description || detailedMovie.short_description || '';
-        }
-
-        // Description statique pour The Truman Show si aucune description n'est disponible
-        if (!description && bestMovie.title.trim() === 'The Truman Show') {
-          description = 'Truman Burbank mène une vie apparemment parfaite, mais il ignore qu’il est la star d’une émission de télé-réalité diffusée 24h/24 depuis sa naissance. Sa vie entière est une mise en scène, et il commence à avoir des doutes sur la réalité qui l’entoure.';
-          console.log('Description statique appliquée pour The Truman Show');
-        }
-
-        // Si aucune description n'est disponible après tout, afficher un message par défaut
-        if (!description) {
-          description = 'Description non disponible';
+      return getMovieDetails(bestMovie.id).then(detailedMovie => {
+        if (detailedMovie) {
+          description = detailedMovie.long_description || detailedMovie.description || detailedMovie.short_description || 'Description non disponible';
+        } else {
+          description = 'Erreur lors de la récupération des détails du film.';
         }
 
         // Vérifier l'URL de l'image
