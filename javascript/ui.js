@@ -7,7 +7,8 @@ function showBestMovie() {
     }
     container.innerHTML = '<h2 id="best-movie-title">Meilleur film</h2><div class="best-movie-content"><p>Chargement en cours... <span class="loading-spinner"></span></p></div>';
   
-    return api.getAllMovies().then(movies => {
+    // Récupérer la première page (triée par votes et imdb_score côté serveur)
+    return api.getMovies(1, 1).then(movies => {
       if (!Array.isArray(movies) || movies.length === 0) {
         logError('Aucun film trouvé ou données invalides.');
         container.innerHTML = `
@@ -27,8 +28,11 @@ function showBestMovie() {
       }
   
       const bestMovie = movies[0];
-      console.log('Meilleur film trouvé :', bestMovie.title, 'Image URL :', bestMovie.image_url, 'Votes :', bestMovie.votes, 'Score IMDB :', bestMovie.imdb_score);
-      console.log('Données brutes du meilleur film :', bestMovie);
+      console.log('Meilleur film (basé sur votes et IMDB score) :', {
+        title: bestMovie.title,
+        imdb_score: bestMovie.imdb_score,
+        votes: bestMovie.votes
+      });
   
       // Vérifier si une description est disponible
       let description = bestMovie.long_description || bestMovie.description || bestMovie.short_description || '';
@@ -86,16 +90,18 @@ function showBestMovie() {
     }
     container.innerHTML = '<h2 id="top-rated-title">Films les mieux notés</h2><div class="films-grid row"><p>Chargement en cours... <span class="loading-spinner"></span></p></div>';
   
-    return api.getAllMovies().then(movies => {
-      if (!Array.isArray(movies) || movies.length === 0) {
-        logError('Aucun film trouvé ou données invalides.');
+    // Récupérer les 6 films suivants après le meilleur film (page 1, positions 2 à 7)
+    return api.getMovies(1, 7).then(movies => {
+      if (!Array.isArray(movies) || movies.length <= 1) {
+        logError('Pas assez de films pour les mieux notés.');
         container.innerHTML = '<h2 id="top-rated-title">Films les mieux notés</h2><div class="films-grid row"><p>Aucun film disponible. <button class="btn btn-primary retry-btn">Réessayer</button></p></div>';
         container.querySelector('.retry-btn').addEventListener('click', () => showTopRatedMovies());
         return;
       }
   
-      console.log('Nombre de films récupérés :', movies.length);
-      const topMovies = movies.slice(1, 7); // Prendre les 6 films suivants après le meilleur film
+      const topMovies = movies.slice(1, 7); // Prendre les 6 films suivants après le meilleur
+      console.log('Top 6 films les mieux notés (basé sur votes et IMDB score) :', topMovies.map(m => ({ title: m.title, imdb_score: m.imdb_score, votes: m.votes })));
+  
       const grid = document.createElement('div');
       grid.className = 'films-grid row';
   
@@ -115,7 +121,7 @@ function showBestMovie() {
   
         // Afficher les films visibles
         visibleMovies.forEach(({ movie, isValid }) => {
-          console.log('Film mieux noté :', movie.title, 'Votes :', movie.votes, 'Score IMDB :', movie.imdb_score);
+          console.log('Film mieux noté affiché :', movie.title, 'IMDB Score :', movie.imdb_score, 'Votes :', movie.votes);
   
           const col = document.createElement('div');
           col.className = 'col';
@@ -224,13 +230,16 @@ function showBestMovie() {
   
     grid.innerHTML = '<p>Chargement en cours... <span class="loading-spinner"></span></p>';
   
-    return api.getMoviesByCategory(category).then(movies => {
+    // Récupérer les 6 premiers films de la catégorie (triés côté serveur)
+    return api.getMoviesByCategory(category, 1, 6).then(movies => {
       if (!Array.isArray(movies) || movies.length === 0) {
         logError(`Aucun film trouvé pour la catégorie : ${category}`);
         grid.innerHTML = '<p>Aucun film disponible. <button class="btn btn-primary retry-btn">Réessayer</button></p>';
         grid.querySelector('.retry-btn').addEventListener('click', () => showMoviesByCategory(category, section));
         return;
       }
+  
+      console.log(`Films affichés pour la catégorie ${category} (triés par votes et IMDB score) :`, movies.map(m => ({ title: m.title, imdb_score: m.imdb_score, votes: m.votes })));
   
       const moviesToShow = movies.slice(0, 6);
       const initialDisplayCount = window.innerWidth <= 480 ? 2 : window.innerWidth <= 1024 ? 4 : 6;
@@ -361,78 +370,38 @@ function showBestMovie() {
           return;
         }
   
-        // Chercher le film dans allMovies ou categoryMovies
-        let movie = api.allMovies.find(m => m.id == movieId);
-        if (!movie) {
-          for (let category in api.categoryMovies) {
-            movie = api.categoryMovies[category].find(m => m.id == movieId);
-            if (movie) break;
+        // Puisqu'il n'y a plus de cache, on fait un appel direct à l'API pour les détails
+        api.getMovieDetails(movieId).then(movie => {
+          if (!movie) {
+            logError('Aucun détail trouvé pour ce film');
+            document.getElementById('movieModalLabel').textContent = 'Erreur';
+            document.getElementById('modal-body').innerHTML = '<p>Erreur lors du chargement des détails du film.</p>';
+            const modalElement = document.getElementById('movieModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            return;
           }
-        }
   
-        if (movie) {
-          console.log('Film trouvé dans les données locales :', movie.title);
-          // Film trouvé dans les données déjà chargées
-          // On préfère toujours récupérer les détails complets via l'API pour avoir les données les plus complètes
-          api.getMovieDetails(movieId).then(detailedMovie => {
-            if (detailedMovie) {
-              movie = detailedMovie; // Remplacer par les données complètes
-            }
-            checkImageUrl(movie.image_url).then(isValid => {
-              document.getElementById('movieModalLabel').textContent = movie.title;
-              document.getElementById('modal-body').innerHTML = `
-                <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
-                ${movie.genres ? `<p><strong>Genres :</strong> ${movie.genres.join(', ')}</p>` : ''}
-                <p><strong>Date de sortie :</strong> ${movie.date_published || 'N/A'}</p>
-                <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
-                <p><strong>Score IMDB :</strong> ${movie.imdb_score || 'N/A'}</p>
-                <p><strong>Réalisateur :</strong> ${movie.directors ? movie.directors.join(', ') : 'N/A'}</p>
-                <p><strong>Acteurs :</strong> ${movie.actors ? movie.actors.join(', ') : 'N/A'}</p>
-                <p><strong>Durée :</strong> ${movie.duration ? movie.duration + ' min' : 'N/A'}</p>
-                <p><strong>Pays d'origine :</strong> ${movie.countries ? movie.countries.join(', ') : 'N/A'}</p>
-                <p><strong>Recettes :</strong> ${movie.worldwide_gross_income ? '$' + formatNumberWithSpaces(movie.worldwide_gross_income) : 'N/A'}</p>
-                <p><strong>Résumé :</strong> ${movie.long_description || movie.description || 'Pas de résumé'}</p>
-              `;
-              const modalElement = document.getElementById('movieModal');
-              const modal = new bootstrap.Modal(modalElement);
-              modal.show();
-            });
+          checkImageUrl(movie.image_url).then(isValid => {
+            document.getElementById('movieModalLabel').textContent = movie.title;
+            document.getElementById('modal-body').innerHTML = `
+              <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
+              ${movie.genres ? `<p><strong>Genres :</strong> ${movie.genres.join(', ')}</p>` : ''}
+              <p><strong>Date de sortie :</strong> ${movie.date_published || 'N/A'}</p>
+              <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
+              <p><strong>Score IMDB :</strong> ${movie.imdb_score || 'N/A'}</p>
+              <p><strong>Réalisateur :</strong> ${movie.directors ? movie.directors.join(', ') : 'N/A'}</p>
+              <p><strong>Acteurs :</strong> ${movie.actors ? movie.actors.join(', ') : 'N/A'}</p>
+              <p><strong>Durée :</strong> ${movie.duration ? movie.duration + ' min' : 'N/A'}</p>
+              <p><strong>Pays d'origine :</strong> ${movie.countries ? movie.countries.join(', ') : 'N/A'}</p>
+              <p><strong>Recettes :</strong> ${movie.worldwide_gross_income ? '$' + formatNumberWithSpaces(movie.worldwide_gross_income) : 'N/A'}</p>
+              <p><strong>Résumé :</strong> ${movie.long_description || movie.description || 'Pas de résumé'}</p>
+            `;
+            const modalElement = document.getElementById('movieModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
           });
-        } else {
-          // Si non trouvé, faire un appel à l'API
-          console.log('Film non trouvé localement, appel API pour les détails...');
-          api.getMovieDetails(movieId).then(movie => {
-            if (!movie) {
-              logError('Aucun détail trouvé pour ce film');
-              document.getElementById('movieModalLabel').textContent = 'Erreur';
-              document.getElementById('modal-body').innerHTML = '<p>Erreur lors du chargement des détails du film.</p>';
-              const modalElement = document.getElementById('movieModal');
-              const modal = new bootstrap.Modal(modalElement);
-              modal.show();
-              return;
-            }
-  
-            checkImageUrl(movie.image_url).then(isValid => {
-              document.getElementById('movieModalLabel').textContent = movie.title;
-              document.getElementById('modal-body').innerHTML = `
-                <img src="${isValid ? movie.image_url : 'logo/alternative.png'}" class="img-fluid mb-3" alt="${movie.title}${isValid ? '' : ' (image alternative)'}">
-                ${movie.genres ? `<p><strong>Genres :</strong> ${movie.genres.join(', ')}</p>` : ''}
-                <p><strong>Date de sortie :</strong> ${movie.date_published || 'N/A'}</p>
-                <p><strong>Classification :</strong> ${movie.rated || 'N/A'}</p>
-                <p><strong>Score IMDB :</strong> ${movie.imdb_score || 'N/A'}</p>
-                <p><strong>Réalisateur :</strong> ${movie.directors ? movie.directors.join(', ') : 'N/A'}</p>
-                <p><strong>Acteurs :</strong> ${movie.actors ? movie.actors.join(', ') : 'N/A'}</p>
-                <p><strong>Durée :</strong> ${movie.duration ? movie.duration + ' min' : 'N/A'}</p>
-                <p><strong>Pays d'origine :</strong> ${movie.countries ? movie.countries.join(', ') : 'N/A'}</p>
-                <p><strong>Recettes :</strong> ${movie.worldwide_gross_income ? '$' + formatNumberWithSpaces(movie.worldwide_gross_income) : 'N/A'}</p>
-                <p><strong>Résumé :</strong> ${movie.long_description || movie.description || 'Pas de résumé'}</p>
-              `;
-              const modalElement = document.getElementById('movieModal');
-              const modal = new bootstrap.Modal(modalElement);
-              modal.show();
-            });
-          });
-        }
+        });
       });
     });
   }

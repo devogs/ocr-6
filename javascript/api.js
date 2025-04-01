@@ -2,53 +2,22 @@
 const apiUrl = 'http://localhost:8000/api/v1/titles/';
 const genresApiUrl = 'http://localhost:8000/api/v1/genres/';
 
-// Variables globales pour stocker les films
-let allMovies = [];
-let categoryMovies = {};
+// Fonction pour récupérer les films depuis l'API avec tri server-side
+function getMovies(page = 1, pageSize = 50) {
+  // Tri par votes (décroissant) puis par imdb_score (décroissant)
+  const url = `${apiUrl}?page=${page}&page_size=${pageSize}&sort_by=-votes,-imdb_score`;
+  console.log(`Récupération des films, page ${page}, URL: ${url}`);
 
-// Fonction pour récupérer tous les films depuis l'API
-function getAllMovies() {
-  // Vérifier si les films sont déjà en cache
-  const cachedMovies = localStorage.getItem('allMovies');
-  if (cachedMovies) {
-    allMovies = JSON.parse(cachedMovies);
-    console.log('Films récupérés depuis le cache :', allMovies.length);
-    preloadImages(allMovies); // Précharger les images
-    return Promise.resolve(allMovies);
-  }
-
-  allMovies = []; // Réinitialiser
-  let nextUrl = 'http://localhost:8000/api/v1/titles/?page_size=50&sort_by=-votes,-imdb_score';
-
-  // Fonction récursive pour récupérer toutes les pages
-  function fetchMovies(url) {
-    if (!url) {
-      console.log('Fin de la pagination, total films récupérés :', allMovies.length);
-      return Promise.resolve(allMovies); // Fin de la pagination
-    }
-
-    return fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Problème avec l\'API des films');
-        }
-        return response.json();
-      })
-      .then(data => {
-        allMovies = allMovies.concat(data.results);
-        console.log(`Page récupérée, total films : ${allMovies.length}`);
-        // Si une page suivante existe, continuer
-        return fetchMovies(data.next);
-      });
-  }
-
-  return fetchMovies(nextUrl)
-    .then(() => {
-      // Stocker les films dans localStorage
-      localStorage.setItem('allMovies', JSON.stringify(allMovies));
-      console.log('Films stockés dans le cache :', allMovies.length);
-      preloadImages(allMovies); // Précharger les images
-      return allMovies;
+  return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Problème avec l\'API des films');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(`Films récupérés (page ${page}) : ${data.results.length}`);
+      return data.results;
     })
     .catch(error => {
       logError(`Erreur lors de la récupération des films : ${error.message}`);
@@ -56,18 +25,20 @@ function getAllMovies() {
     });
 }
 
-// Fonction pour récupérer les films d'une catégorie
-function getMoviesByCategory(category) {
-  return fetch(apiUrl + '?genre=' + category + '&page_size=50')
+// Fonction pour récupérer les films d'une catégorie avec tri server-side
+function getMoviesByCategory(category, page = 1, pageSize = 50) {
+  const url = `${apiUrl}?genre=${category}&page=${page}&page_size=${pageSize}&sort_by=-votes,-imdb_score`;
+  console.log(`Récupération des films pour la catégorie ${category}, page ${page}, URL: ${url}`);
+
+  return fetch(url)
     .then(response => {
       if (!response.ok) {
-        throw new Error('Problème avec l\'API');
+        throw new Error(`Problème avec l'API pour la catégorie ${category}`);
       }
       return response.json();
     })
     .then(data => {
-      categoryMovies[category] = data.results; // Stocker les films par catégorie
-      preloadImages(data.results); // Précharger les images
+      console.log(`Films récupérés pour la catégorie ${category} (page ${page}) : ${data.results.length}`);
       return data.results;
     })
     .catch(error => {
@@ -103,6 +74,11 @@ function getCategories() {
 
   // Fonction récursive pour gérer la pagination
   function fetchCategories(url) {
+    if (!url) {
+      console.log('Fin de la pagination des catégories, total catégories récupérées :', allCategories.length);
+      return Promise.resolve(allCategories);
+    }
+
     return fetch(url)
       .then(response => {
         if (!response.ok) {
@@ -113,11 +89,9 @@ function getCategories() {
       .then(data => {
         // Ajouter les genres de la page actuelle
         allCategories = allCategories.concat(data.results.map(genre => genre.name));
+        console.log(`Page de catégories récupérée, total : ${allCategories.length}`);
         // Si une page suivante existe, continuer à récupérer
-        if (data.next) {
-          return fetchCategories(data.next);
-        }
-        return allCategories;
+        return fetchCategories(data.next);
       });
   }
 
@@ -132,11 +106,9 @@ function getCategories() {
     });
 }
 
-// Exporter les variables et fonctions pour les utiliser dans d'autres fichiers
+// Exporter les fonctions pour les utiliser dans d'autres fichiers
 const api = {
-  allMovies,
-  categoryMovies,
-  getAllMovies,
+  getMovies,
   getMoviesByCategory,
   getMovieDetails,
   getCategories
