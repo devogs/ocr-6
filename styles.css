@@ -52,6 +52,55 @@ h2 {
   font-weight: normal;
 }
 
+/* Loading Spinner */
+.loading-spinner::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ff0000;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* "Voir plus" Button */
+.see-more-btn {
+  display: block;
+  margin: 15px auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.see-more-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Retry Button */
+.retry-btn {
+  margin-left: 10px;
+  padding: 5px 15px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.retry-btn:hover {
+  background-color: #0056b3;
+}
+
 /* Section Meilleur film */
 .meilleur-film {
   margin-bottom: 20px;
@@ -346,9 +395,9 @@ h2 {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .meilleur-film .card {
-    flex-direction: column; /* Sur mobile, empiler les éléments */
+    flex-direction: column; /* Sur mobile et tablette, empiler les éléments */
     align-items: flex-start;
   }
 
@@ -359,13 +408,37 @@ h2 {
   }
 
   .meilleur-film .details-btn {
-    align-self: center; /* Centrer le bouton sur mobile */
+    align-self: center; /* Centrer le bouton sur mobile et tablette */
   }
+}
 
+/* Tablet: 4 movies visible */
+@media (min-width: 481px) and (max-width: 1024px) {
   .films-mieux-notes .col,
   .categories .col,
   .autres .col {
-    flex: 1 1 calc(33.33% - 15px); /* 3 colonnes sur mobile */
+    flex: 1 1 calc(25% - 15px); /* 4 colonnes */
+  }
+
+  .films-mieux-notes .card-body,
+  .categories .card-body,
+  .autres .card-body {
+    min-height: 120px; /* Ajuster la hauteur minimale sur tablette */
+  }
+
+  .films-mieux-notes .details-btn,
+  .categories .details-btn,
+  .autres .details-btn {
+    align-self: center; /* Centrer le bouton sur tablette */
+  }
+}
+
+/* Mobile: 2 movies visible */
+@media (max-width: 480px) {
+  .films-mieux-notes .col,
+  .categories .col,
+  .autres .col {
+    flex: 1 1 calc(50% - 15px); /* 2 colonnes */
   }
 
   .films-mieux-notes .card-body,
@@ -378,13 +451,5 @@ h2 {
   .categories .details-btn,
   .autres .details-btn {
     align-self: center; /* Centrer le bouton sur mobile */
-  }
-}
-
-@media (max-width: 480px) {
-  .films-mieux-notes .col,
-  .categories .col,
-  .autres .col {
-    flex: 1 1 calc(50% - 15px); /* 2 colonnes sur petit écran */
   }
 }
