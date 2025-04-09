@@ -86,6 +86,23 @@ h2 {
   background-color: #0056b3;
 }
 
+/* "Voir moins" Button */
+.see-less-btn {
+  display: block;
+  margin: 15px auto;
+  padding: 10px 20px;
+  background-color: #dc3545; /* Rouge pour le différencier */
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.see-less-btn:hover {
+  background-color: #c82333;
+}
+
 /* Retry Button */
 .retry-btn {
   margin-left: 10px;
@@ -119,16 +136,23 @@ h2 {
 }
 
 .meilleur-film .card {
-  display: flex; /* Utiliser flexbox pour aligner l'image et le texte */
-  flex-direction: row; /* Image à gauche, texte à droite */
+  display: flex;
+  flex-direction: column; /* Empiler sur mobile */
   align-items: center; /* Centrer verticalement */
   gap: 20px; /* Espacement entre l'image et le texte */
   border: none; /* Pas de bordure supplémentaire sur la carte */
   box-shadow: none; /* Pas d'ombre supplémentaire */
 }
 
+/* Conteneur pour l'image, pour qu'elle ait la même taille que les autres sections */
+.meilleur-film .image-container {
+  flex: 0 0 calc(100% - 15px); /* 1 colonne (mobile) */
+  max-width: calc(100% - 15px); /* Fixer la largeur maximale */
+  min-width: 150px;
+}
+
 .meilleur-film .card-img {
-  width: 150px; /* Taille de l'image */
+  width: 100%; /* Remplir la largeur du conteneur */
   height: auto; /* Hauteur automatique pour préserver les proportions */
   object-fit: contain; /* Afficher l'image entière */
 }
@@ -157,7 +181,7 @@ h2 {
   border: none;
   padding: 5px 15px; /* Forme rectangulaire */
   border-radius: 3px; /* Coins légèrement arrondis */
-  align-self: flex-end; /* Positionner le bouton à droite */
+  align-self: center; /* Centrer le bouton */
   cursor: pointer;
 }
 
@@ -176,56 +200,6 @@ h2 {
   gap: 15px;
 }
 
-.films-mieux-notes .col {
-  flex: 1 1 calc(16.66% - 15px); /* 6 colonnes avec espacement */
-  min-width: 150px;
-}
-
-.films-mieux-notes .card {
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.films-mieux-notes .card:hover {
-  transform: translateY(-5px);
-}
-
-.films-mieux-notes .card-img-top {
-  width: 100%;
-  height: auto; /* Hauteur automatique pour afficher l'image entière */
-  object-fit: contain; /* Afficher l'image entière sans rognage */
-}
-
-.films-mieux-notes .card-body {
-  padding: 10px;
-  min-height: 100px; /* Hauteur minimale pour uniformiser */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Titre en haut, bouton en bas */
-}
-
-.films-mieux-notes .card-title {
-  font-size: 1rem;
-  margin-bottom: 10px;
-}
-
-.films-mieux-notes .details-btn {
-  background-color: #ff0000;
-  color: #fff;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  align-self: center; /* Centrer le bouton horizontalement */
-}
-
-.films-mieux-notes .details-btn:hover {
-  background-color: #e60000;
-}
-
 /* Sections de catégories */
 .categories .category-section {
   margin-bottom: 30px;
@@ -235,56 +209,6 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
-}
-
-.categories .col {
-  flex: 1 1 calc(16.66% - 15px); /* 6 colonnes avec espacement */
-  min-width: 150px;
-}
-
-.categories .card {
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.categories .card:hover {
-  transform: translateY(-5px);
-}
-
-.categories .card-img-top {
-  width: 100%;
-  height: auto; /* Hauteur automatique pour afficher l'image entière */
-  object-fit: contain; /* Afficher l'image entière sans rognage */
-}
-
-.categories .card-body {
-  padding: 10px;
-  min-height: 100px; /* Hauteur minimale pour uniformiser */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Titre en haut, bouton en bas */
-}
-
-.categories .card-title {
-  font-size: 1rem;
-  margin-bottom: 10px;
-}
-
-.categories .details-btn {
-  background-color: #ff0000;
-  color: #fff;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  align-self: center; /* Centrer le bouton horizontalement */
-}
-
-.categories .details-btn:hover {
-  background-color: #e60000;
 }
 
 /* Section Autres (menu déroulant) */
@@ -306,42 +230,60 @@ h2 {
   gap: 15px;
 }
 
+/* Mobile-first: 1 film par ligne */
+.films-mieux-notes .col,
+.categories .col,
 .autres .col {
-  flex: 1 1 calc(16.66% - 15px); /* 6 colonnes avec espacement */
+  flex: 0 0 calc(100% - 15px); /* 1 colonne */
+  max-width: calc(100% - 15px); /* Fixer la largeur maximale */
   min-width: 150px;
+  display: block; /* Assurer que le display peut être contrôlé par JS */
 }
 
+.films-mieux-notes .card,
+.categories .card,
 .autres .card {
   border: 1px solid #ddd;
   border-radius: 5px;
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 
+.films-mieux-notes .card:hover,
+.categories .card:hover,
 .autres .card:hover {
   transform: translateY(-5px);
 }
 
+.films-mieux-notes .card-img-top,
+.categories .card-img-top,
 .autres .card-img-top {
   width: 100%;
-  height: auto; /* Hauteur automatique pour afficher l'image entière */
+  height: auto; /* Hauteur automatique pour préserver les proportions */
   object-fit: contain; /* Afficher l'image entière sans rognage */
 }
 
+.films-mieux-notes .card-body,
+.categories .card-body,
 .autres .card-body {
   padding: 10px;
-  min-height: 100px; /* Hauteur minimale pour uniformiser */
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Titre en haut, bouton en bas */
 }
 
+.films-mieux-notes .card-title,
+.categories .card-title,
 .autres .card-title {
   font-size: 1rem;
   margin-bottom: 10px;
 }
 
+.films-mieux-notes .details-btn,
+.categories .details-btn,
 .autres .details-btn {
   background-color: #ff0000;
   color: #fff;
@@ -352,6 +294,8 @@ h2 {
   align-self: center; /* Centrer le bouton horizontalement */
 }
 
+.films-mieux-notes .details-btn:hover,
+.categories .details-btn:hover,
 .autres .details-btn:hover {
   background-color: #e60000;
 }
@@ -394,36 +338,30 @@ h2 {
   transition: background-color 0.2s;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .meilleur-film .card {
-    flex-direction: column; /* Sur mobile et tablette, empiler les éléments */
-    align-items: flex-start;
-  }
-
-  .meilleur-film .card-img {
-    width: 100%;
-    max-width: 200px;
-    margin-bottom: 10px;
-  }
-
-  .meilleur-film .details-btn {
-    align-self: center; /* Centrer le bouton sur mobile et tablette */
-  }
-}
-
-/* Tablet: 4 movies visible */
-@media (min-width: 481px) and (max-width: 1024px) {
+/* Tablet: 2 films par ligne (≥ 481px) */
+@media (min-width: 481px) {
   .films-mieux-notes .col,
   .categories .col,
   .autres .col {
-    flex: 1 1 calc(25% - 15px); /* 4 colonnes */
+    flex: 0 0 calc(50% - 15px); /* 2 colonnes */
+    max-width: calc(50% - 15px); /* Fixer la largeur maximale */
+  }
+
+  .meilleur-film .image-container {
+    flex: 0 0 calc(50% - 15px); /* 2 colonnes */
+    max-width: calc(50% - 15px); /* Fixer la largeur maximale */
+  }
+
+  .films-mieux-notes .card-img-top,
+  .categories .card-img-top,
+  .autres .card-img-top {
+    height: auto; /* Maintenir la hauteur proportionnelle */
   }
 
   .films-mieux-notes .card-body,
   .categories .card-body,
   .autres .card-body {
-    min-height: 120px; /* Ajuster la hauteur minimale sur tablette */
+    padding: 10px; /* Maintenir l'espacement */
   }
 
   .films-mieux-notes .details-btn,
@@ -431,25 +369,50 @@ h2 {
   .autres .details-btn {
     align-self: center; /* Centrer le bouton sur tablette */
   }
+
+  .meilleur-film .card {
+    flex-direction: row; /* Image à gauche, texte à droite */
+    align-items: center; /* Centrer verticalement */
+  }
+
+  .meilleur-film .card-img {
+    margin-bottom: 0;
+  }
+
+  .meilleur-film .details-btn {
+    align-self: flex-end; /* Positionner le bouton à droite */
+  }
 }
 
-/* Mobile: 2 movies visible */
-@media (max-width: 480px) {
+/* Desktop: 3 films par ligne (≥ 1025px) */
+@media (min-width: 1025px) {
   .films-mieux-notes .col,
   .categories .col,
   .autres .col {
-    flex: 1 1 calc(50% - 15px); /* 2 colonnes */
+    flex: 0 0 calc(33.33% - 15px); /* 3 colonnes */
+    max-width: calc(33.33% - 15px); /* Fixer la largeur maximale */
+  }
+
+  .meilleur-film .image-container {
+    flex: 0 0 calc(33.33% - 15px); /* 3 colonnes */
+    max-width: calc(33.33% - 15px); /* Fixer la largeur maximale */
+  }
+
+  .films-mieux-notes .card-img-top,
+  .categories .card-img-top,
+  .autres .card-img-top {
+    height: auto; /* Maintenir la hauteur proportionnelle */
   }
 
   .films-mieux-notes .card-body,
   .categories .card-body,
   .autres .card-body {
-    min-height: 120px; /* Ajuster la hauteur minimale sur mobile */
+    padding: 10px; /* Maintenir l'espacement */
   }
 
   .films-mieux-notes .details-btn,
   .categories .details-btn,
   .autres .details-btn {
-    align-self: center; /* Centrer le bouton sur mobile */
+    align-self: center; /* Centrer le bouton sur desktop */
   }
 }
